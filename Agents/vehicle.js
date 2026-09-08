@@ -1,39 +1,54 @@
-class Vehicle extends p5.Vector{
+class Vehicle{
   constructor(x, y) {
-    super(x,y);
-    this.mass = 1;
-    this.velocity = p5.Vector.random2D();
-    this.velocity.mult(random(0.9));
-    this.acceleration = createVector(0, 0);
+    this.pos = createVector(x,y);
+    this.vel = createVector(0,0);
+    this.acc = createVector(0, 0);
 
-    //appearance ----------------
-    this.lifetime = 255;
-    this.r = 32;
+    this.r = 16;
+    this.mass = 1;
+    this.maxSpeed = 4;
+    this.maxForce = 0.1;
+
+  }
+
+  seek(target){
+    let force = p5.Vector.sub(target, this.pos); //desired path
+    force.setMag(this.maxSpeed); 
+    force.sub(this.vel);    //subtract current velocity and limit the acting force to "maxForce"
+    force.limit(this.maxForce);
+    return(force);
+  }
+
+  flee(predator){
+    return this.seek(predator).mult(-1);
+  }
+
+  pursue(target){
+    //will implement a pursuit based on craig reynolds paper
   }
 
   applyForce(force) {
     let f = p5.Vector.div(force, this.mass);
-    this.acceleration.add(f);
+    this.acc.add(f);
 
   }
 
   update() {
-    this.velocity.add(this.acceleration);
-    this.add(this.velocity);
-    this.acceleration.mult(0);
-    this.lifetime -= 5;
-  }
-
-
-  finished(){
-    return (this.lifetime < 0);
+    this.vel.add(this.acc);
+    this.vel.limit(this.maxSpeed);
+    this.pos.add(this.vel);
+    this.acc.mult(0);
   }
 
   show() {
-    tint(255, this.lifetime);
-    imageMode(CENTER);
-    image(img, this.x, this.y, this.r, this.r);
-    //ellipse(this.x, this.y, this.r);
+    stroke(225);
+    strokeWeight(2);
+    fill(220);
+    push();
+      translate(this.pos.x, this.pos.y,);
+      rotate(this.vel.heading());
+      triangle(-this.r, -this.r/4, -this.r, this.r/4, 0,0);
+    pop();
+    /* ellipse(this.pos.x, this.pos.y, this.r * 2); */
   }
-
 }
