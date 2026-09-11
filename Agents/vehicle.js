@@ -6,25 +6,51 @@ class Vehicle{
 
     this.r = 16;
     this.mass = 1;
-    this.maxSpeed = 10;
-    this.maxForce = 0.25;
-
+    this.maxSpeed = 6;
+    this.maxForce = 0.4;
   }
 
+
   seek(target){
-    let force = p5.Vector.sub(target, this.pos); //desired path
+
+    let targetV = target.pos.copy();
+    let force = p5.Vector.sub(targetV, this.pos); //desired path
+    force.setMag(this.maxSpeed); 
     force.setMag(this.maxSpeed); 
     force.sub(this.vel);    //subtract current velocity and limit the acting force to "maxForce"
     force.limit(this.maxForce);
     return(force);
+
+
   }
+
+
+
+    arrive(target){
+    let targetV = target.pos.copy();
+    let force = p5.Vector.sub(targetV, this.pos); //desired path
+
+    let slowRadius = 100;
+    let dist = force.mag();
+
+    if(dist < slowRadius){
+      let desiredSpeed = map(dist, 0, slowRadius, 0, this.maxSpeed);
+      force.setMag(desiredSpeed);
+    } else {
+        force.setMag(this.maxSpeed); 
+    } 
+    force.sub(this.vel);    //subtract current velocity and limit the acting force to "maxForce"
+    force.limit(this.maxForce);
+    return(force);
+  }
+
 
   pursue(vehicle){
     let target = vehicle.pos.copy();
     let prediction = vehicle.vel.copy();
     prediction.mult(10);
     target.add(prediction);
-    return this.seek(target);
+    return this.seek({pos: target});
   }
 
   flee(predator){
@@ -36,7 +62,6 @@ class Vehicle{
     pursuit.mult(-1);
     return pursuit;
   }
-
 
   applyForce(force) {
     let f = p5.Vector.div(force, this.mass);
@@ -98,19 +123,25 @@ class Vehicle{
 class Target extends Vehicle{
   constructor(x,y){
     super(x,y);
-    this.vel = p5.Vector.random2D();
-    this.vel.mult(5);
+/*     this.vel = p5.Vector.random2D();
+    this.vel.mult(5); */
+  }
+  
+  update(){
+    this.pos.set(mouseX,mouseY);
   }
 
   show(){
 
     noStroke();
     fill(255,0,0);
-    push();
+
+    ellipse(this.pos.x, this.pos.y, 16);
+/*     push();
       translate(this.pos.x, this.pos.y,);
       rotate(this.vel.heading());
       triangle(-this.r - 2, -this.r/4, -this.r - 2, this.r/4, 0,0);
-    pop();
+    pop(); */
 
   }
 
@@ -119,5 +150,10 @@ class Target extends Vehicle{
     this.vel = createVector(random(-3, 3),random(-3,3));
   } */
 
+}
 
+class WrapperPos{
+  constructor(x,y){
+    this.pos(x,y);
+  }
 }
