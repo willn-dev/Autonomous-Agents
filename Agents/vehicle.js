@@ -11,37 +11,30 @@ class Vehicle{
   }
 
 
-  seek(target){
+  seek(target, arrival){
 
     let targetV = target.pos.copy();
     let force = p5.Vector.sub(targetV, this.pos); //desired path
-    force.setMag(this.maxSpeed); 
-    force.setMag(this.maxSpeed); 
+    let desiredSpeed = this.maxSpeed;
+
+    if(arrival){
+      let slowRadius = 100;
+      let dist = force.mag();
+
+      if(dist < slowRadius){
+        desiredSpeed = map(dist, 0, slowRadius, 0, this.maxSpeed);
+        force.setMag(desiredSpeed);
+      }
+    }
+
+    force.setMag(desiredSpeed); 
     force.sub(this.vel);    //subtract current velocity and limit the acting force to "maxForce"
     force.limit(this.maxForce);
     return(force);
-
-
   }
 
-
-
     arrive(target){
-    let targetV = target.pos.copy();
-    let force = p5.Vector.sub(targetV, this.pos); //desired path
-
-    let slowRadius = 100;
-    let dist = force.mag();
-
-    if(dist < slowRadius){
-      let desiredSpeed = map(dist, 0, slowRadius, 0, this.maxSpeed);
-      force.setMag(desiredSpeed);
-    } else {
-        force.setMag(this.maxSpeed); 
-    } 
-    force.sub(this.vel);    //subtract current velocity and limit the acting force to "maxForce"
-    force.limit(this.maxForce);
-    return(force);
+    return this.seek(target, true);
   }
 
 
@@ -63,12 +56,17 @@ class Vehicle{
     return pursuit;
   }
 
+  /**
+   * divides force by mass, then adds to the objects acceleration
+   */
   applyForce(force) {
     let f = p5.Vector.div(force, this.mass);
     this.acc.add(f);
-
   }
 
+    /**
+     * In the event an automated target moves offscreen, it will be returned on the opposite side.
+     */
     edges() {
       let edgeWrap = false;
 
@@ -93,6 +91,9 @@ class Vehicle{
       }
   }
 
+  /**
+   * blank function for method override
+   */
   onEdgeWrap(){
     
   }
@@ -114,17 +115,12 @@ class Vehicle{
       rotate(this.vel.heading());
       triangle(-this.r, -this.r/4, -this.r, this.r/4, 0,0);
     pop();
-    /* ellipse(this.pos.x, this.pos.y, this.r * 2); */
   }
 }
-
-
 
 class Target extends Vehicle{
   constructor(x,y){
     super(x,y);
-/*     this.vel = p5.Vector.random2D();
-    this.vel.mult(5); */
   }
   
   update(){
@@ -132,28 +128,8 @@ class Target extends Vehicle{
   }
 
   show(){
-
     noStroke();
     fill(255,0,0);
-
     ellipse(this.pos.x, this.pos.y, 16);
-/*     push();
-      translate(this.pos.x, this.pos.y,);
-      rotate(this.vel.heading());
-      triangle(-this.r - 2, -this.r/4, -this.r - 2, this.r/4, 0,0);
-    pop(); */
-
-  }
-
-
-/*   onEdgeWrap(){
-    this.vel = createVector(random(-3, 3),random(-3,3));
-  } */
-
-}
-
-class WrapperPos{
-  constructor(x,y){
-    this.pos(x,y);
   }
 }
