@@ -10,7 +10,6 @@ class Vehicle{
     this.maxForce = 0.4;
   }
 
-
   seek(target, arrival){
 
     let targetV = target.pos.copy();
