@@ -6,8 +6,8 @@ class Vehicle{
 
     this.r = 16;
     this.mass = 1;
-    this.maxSpeed = 2;
-    this.maxForce = 0.1;
+    this.maxSpeed = 1;
+    this.maxForce = 0.05;
 
     this.wanderTheta = PI/2;
   }
